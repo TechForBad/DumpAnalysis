@@ -3,9 +3,14 @@
 #include "CdbHelper.h"
 #include "PeParser.h"
 
+// 分析的dump文件路径
 constexpr LPCWSTR g_dumpPath = L"D:\\analyze\\CalculatorApp.dmp";
+
+// 需要输出为PE文件的模块名
 constexpr LPCSTR g_moduleName = "ntdll";
-constexpr LPCWSTR g_dumpPEPath = L"D:\\analyze\\ntdll_mydump.dll";
+
+// 输出的PE文件路径
+constexpr LPCWSTR g_outputPEPath = L"D:\\analyze\\ntdll_mydump.dll";
 
 int main()
 {
@@ -53,7 +58,7 @@ int main()
             break;
         }
         DWORD_PTR entryPoint = (ULONG_PTR)moduleBase + peParser.getEntryPoint();
-        peParser.dumpProcess((DWORD_PTR)moduleBase, entryPoint, g_dumpPEPath);
+        peParser.dumpProcess((DWORD_PTR)moduleBase, entryPoint, g_outputPEPath);
     } while (false);
 
     if (!cdbHelper->FinishCdb())
