@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{95333a31-c8df-47a2-8b21-10a9206d67ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CdbHelper">
+      <UniqueIdentifier>{4bed3062-177a-49ca-bf3f-5a726fc23f0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PeParser">
+      <UniqueIdentifier>{b2c38edc-d0f6-4170-9295-fd3602e3a077}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DumpAnalysis.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="CdbHelper.cpp">
+      <Filter>CdbHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="PeParser.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessAccessHelp.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeWinApi.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="Scylla.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationHolder.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="Architecture.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginLoader.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessLister.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemInformation.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="StringConversion.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceNameResolver.cpp">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="distorm.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="mnemonics.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="decoder.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="instructions.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="insts.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="operands.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="prefix.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="textdefs.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+    <ClCompile Include="wstring.c">
+      <Filter>PeParser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="CdbHelper.h">
+      <Filter>CdbHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="PeParser.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessAccessHelp.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="NativeWinApi.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Scylla.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationHolder.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Architecture.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginLoader.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessLister.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemInformation.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="StringConversion.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceNameResolver.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="distorm.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="mnemonics.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="decoder.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="instructions.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="insts.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="operands.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="prefix.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="textdefs.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="wstring.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+    <ClInclude Include="x86defs.h">
+      <Filter>PeParser</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
