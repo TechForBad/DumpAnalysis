@@ -1,5 +1,7 @@
 #include "CdbHelper.h"
 
+#define TEMP_BUFFER_LEN 4096
+
 static std::vector<std::string> splitStringBySpace(const std::string& str)
 {
     std::vector<std::string> tokens;
@@ -33,7 +35,7 @@ bool CdbHelper::SendCommond(std::string command, std::string& result)
     }
 
     std::string outputBuffer = "";
-    CHAR tempOutputBuffer[1024];
+    CHAR tempOutputBuffer[TEMP_BUFFER_LEN];
     DWORD tempBytesRead = 0;
     DWORD bytesWritten = 0;
 
@@ -100,23 +102,23 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, std::vector<BYTE>& b
 
     if (!SendCommond(command, result))
     {
-        fprintf(stderr, "SendCommond failed\n");
+        LOG("SendCommond failed\n");
         return false;
     }
 
     std::vector<std::string> splitStringlist = splitStringBySpace(result);
     byteList.clear();
     byteList.reserve(splitStringlist.size());
-    for (const std::string& splitString : splitStringlist)
+    for (size_t i = 0; i < splitStringlist.size(); ++i)
     {
+        std::string splitString = splitStringlist[i];
         if ("??" == splitString)
         {
             return false;
         }
         else
         {
-            BYTE byteValue = std::stoi(splitString, nullptr, 16);
-            byteList.push_back(byteValue);
+            byteList[i] = std::stoi(splitString, nullptr, 16);
         }
     }
 
@@ -133,13 +135,13 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
 
     if (NULL == pByte)
     {
-        fprintf(stderr, "Param Error\n");
+        LOG("Param Error\n");
         return false;
     }
     std::vector<BYTE> byteList{};
     if (!GetData(pStartAddress, length, byteList))
     {
-        fprintf(stderr, "GetData failed\n");
+        LOG("GetData failed\n");
         return false;
     }
     memcpy(pByte, byteList.data(), byteList.size());
@@ -213,50 +215,50 @@ bool CdbHelper::InitCdb(std::wstring dump_path)
     CHAR tempOutputBuffer[1024];
     DWORD tempBytesRead = 0;
 
-    // 设置安全属性，以便子进程可以继承句柄  
+    // 设置安全属性，以便子进程可以继承句柄
     SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES) };
     sa.bInheritHandle = TRUE;
     sa.lpSecurityDescriptor = NULL;
 
-    // 创建管道用于标准输入  
+    // 创建管道用于标准输入
     if (!CreatePipe(&hChildStd_IN_Rd, &hChildStd_IN_Wr_, &sa, 0))
     {
-        fprintf(stderr, "StdIn Rd CreatePipe\n");
+        LOG("StdIn Rd CreatePipe\n");
         return false;
     }
 
-    // 确保写句柄在子进程中不可见  
+    // 确保写句柄在子进程中不可见
     if (!SetHandleInformation(hChildStd_IN_Wr_, HANDLE_FLAG_INHERIT, 0))
     {
-        fprintf(stderr, "StdIn SetHandleInformation\n");
+        LOG("StdIn SetHandleInformation\n");
         return false;
     }
 
-    // 创建管道用于标准输出  
+    // 创建管道用于标准输出
     if (!CreatePipe(&hChildStd_OUT_Rd_, &hChildStd_OUT_Wr, &sa, 0))
     {
-        fprintf(stderr, "StdOut Rd CreatePipe\n");
+        LOG("StdOut Rd CreatePipe\n");
         return false;
     }
 
-    // 确保读句柄在子进程中不可见  
+    // 确保读句柄在子进程中不可见
     if (!SetHandleInformation(hChildStd_OUT_Rd_, HANDLE_FLAG_INHERIT, 0))
     {
-        fprintf(stderr, "StdOut SetHandleInformation\n");
+        LOG("StdOut SetHandleInformation\n");
         return false;
     }
 
-    // 创建管道用于标准错误  
+    // 创建管道用于标准错误
     if (!CreatePipe(&hChildStd_ERR_Rd_, &hChildStd_ERR_Wr, &sa, 0))
     {
-        fprintf(stderr, "StdErr Rd CreatePipe\n");
+        LOG("StdErr Rd CreatePipe\n");
         return false;
     }
 
-    // 确保读句柄在子进程中不可见  
+    // 确保读句柄在子进程中不可见
     if (!SetHandleInformation(hChildStd_ERR_Rd_, HANDLE_FLAG_INHERIT, 0))
     {
-        fprintf(stderr, "StdErr SetHandleInformation\n");
+        LOG("StdErr SetHandleInformation\n");
         return false;
     }
 
