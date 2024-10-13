@@ -118,7 +118,7 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, std::vector<BYTE>& b
         }
         else
         {
-            byteList[i] = std::stoi(splitString, nullptr, 16);
+            byteList.push_back(std::stoi(splitString, nullptr, 16));
         }
     }
 
