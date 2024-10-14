@@ -17,7 +17,6 @@ public:
 
     bool SendCommond(std::string command, std::string& result);
 
-    bool GetData2(PVOID pStartAddress, SIZE_T length, PBYTE pByte);
     bool GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte);
 
     typedef struct _ModuleInfo
