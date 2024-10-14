@@ -62,7 +62,8 @@ std::string ConvertWCharToString(const wchar_t* wcharStr);
 BOOL AdjustProcessTokenPrivilege();
 
 // 模块获取自身所处文件夹目录
-bool GetCurrentModuleDirPath(WCHAR* dirPath);
+bool GetCurrentModuleDirPathA(CHAR* dirPath);
+bool GetCurrentModuleDirPathW(WCHAR* dirPath);
 
 // 运行命令
 bool RunAppWithCommand(
@@ -70,5 +71,8 @@ bool RunAppWithCommand(
 bool RunAppWithRedirection(
     const wchar_t* application, const wchar_t* command,
     HANDLE input, HANDLE output, HANDLE error, HANDLE* process);
+
+// 判断文件是否存在
+bool FilePathIsExist(const char* filepath_in, bool is_directory);
 
 }

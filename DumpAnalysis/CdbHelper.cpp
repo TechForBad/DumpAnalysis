@@ -87,44 +87,6 @@ bool CdbHelper::SendCommond(std::string command, std::string& result)
     return true;
 }
 
-bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, std::vector<BYTE>& byteList)
-{
-    if (!isInit_)
-    {
-        LOG("Not init");
-        return false;
-    }
-
-    std::string command_prefix = tool::Format(".for(r $t0 = 0x%llx; @$t0 < 0x%llx; r $t0 = @$t0 + 1)", (ULONG_PTR)pStartAddress, (ULONG_PTR)pStartAddress + length);
-    std::string command_suffix = R"({.if($vvalid(@$t0, 1)){.printf @"%02x ", by(@$t0)}.else{.printf "?? "}};.printf "\n";)";
-    std::string command = command_prefix + command_suffix;
-    std::string result;
-
-    if (!SendCommond(command, result))
-    {
-        LOG("SendCommond failed\n");
-        return false;
-    }
-
-    std::vector<std::string> splitStringlist = splitStringBySpace(result);
-    byteList.clear();
-    byteList.reserve(splitStringlist.size());
-    for (size_t i = 0; i < splitStringlist.size(); ++i)
-    {
-        std::string splitString = splitStringlist[i];
-        if ("??" == splitString)
-        {
-            return false;
-        }
-        else
-        {
-            byteList.push_back(std::stoi(splitString, nullptr, 16));
-        }
-    }
-
-    return true;
-}
-
 bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
 {
     if (!isInit_)
@@ -133,18 +95,110 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
         return false;
     }
 
-    if (NULL == pByte)
+    if (length <= 1)
     {
-        LOG("Param Error\n");
-        return false;
+        std::string command_prefix = tool::Format(".for(r $t0 = 0x%llx; @$t0 < 0x%llx; r $t0 = @$t0 + 1)", (ULONG_PTR)pStartAddress, (ULONG_PTR)pStartAddress + length);
+        std::string command_suffix = R"({.if($vvalid(@$t0, 1)){.printf @"%02x ", by(@$t0)}.else{.printf "?? "}};.printf "\n";)";
+        std::string command = command_prefix + command_suffix;
+        std::string result;
+        if (!SendCommond(command, result))
+        {
+            LOG("SendCommond failed");
+            return false;
+        }
+
+        std::vector<std::string> splitStringlist = splitStringBySpace(result);
+        for (size_t i = 0; i < splitStringlist.size(); ++i)
+        {
+            std::string splitString = splitStringlist[i];
+            if ("??" == splitString)
+            {
+                return false;
+            }
+            else
+            {
+                pByte[i] = std::stoi(splitString, nullptr, 16);
+            }
+        }
     }
-    std::vector<BYTE> byteList{};
-    if (!GetData(pStartAddress, length, byteList))
+    else
     {
-        LOG("GetData failed\n");
-        return false;
+        // 拼接得到临时文件路径
+        CHAR tempFilePath[MAX_PATH] = { 0 };
+        if (!tool::GetCurrentModuleDirPathA(tempFilePath))
+        {
+            LOG("GetCurrentModuleDirPathA failed");
+            return false;
+        }
+        strcpy(tempFilePath, "temp.txt");
+
+        // 如果文件存在，则删除
+        if (tool::FilePathIsExist(tempFilePath, false))
+        {
+            if (!DeleteFileA(tempFilePath))
+            {
+                LOG("DeleteFileA failed");
+                return false;
+            }
+        }
+
+        // 打开临时文件
+        HANDLE hFile = CreateFileA(
+            tempFilePath,
+            GENERIC_READ | GENERIC_WRITE,
+            FILE_SHARE_READ | FILE_SHARE_WRITE,
+            NULL,
+            CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL
+        );
+        if (INVALID_HANDLE_VALUE == hFile)
+        {
+            LOG("CreateFileA failed, last error: %d", GetLastError());
+            DeleteFileA(tempFilePath);
+            return false;
+        }
+
+        std::string command = tool::Format(".writemem %s 0x%llx l0x%llx", tempFilePath, (ULONG_PTR)pStartAddress, length);
+        std::string result;
+        if (!SendCommond(command, result))
+        {
+            LOG("SendCommond failed");
+            DeleteFileA(tempFilePath);
+            return false;
+        }
+
+        DWORD fileSize = GetFileSize(hFile, NULL);
+        if (fileSize != length)
+        {
+            LOG("GetFileSize failed, read size: %d, need size: %d", fileSize, length);
+            DeleteFileA(tempFilePath);
+            return false;
+        }
+
+        SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+
+        DWORD bytesRead = 0;
+        if (!ReadFile(hFile, pByte, length, &bytesRead, NULL))
+        {
+            LOG("ReadFile failed, last error: %d", GetLastError());
+            CloseHandle(hFile);
+            DeleteFileA(tempFilePath);
+            return false;
+        }
+
+        if (bytesRead != length)
+        {
+            LOG("need read: %d, but read: %d", length, bytesRead);
+            CloseHandle(hFile);
+            DeleteFileA(tempFilePath);
+            return false;
+        }
+
+        CloseHandle(hFile);
+        DeleteFileA(tempFilePath);
     }
-    memcpy(pByte, byteList.data(), byteList.size());
+
     return true;
 }
 

@@ -107,11 +107,26 @@ BOOL AdjustProcessTokenPrivilege()
     return TRUE;
 }
 
-bool GetCurrentModuleDirPath(WCHAR* dirPath)
+bool GetCurrentModuleDirPathA(CHAR* dirPath)
 {
     HMODULE hModule = NULL;
-    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)GetCurrentModuleDirPath, &hModule);
-    GetModuleFileName(hModule, dirPath, MAX_PATH);
+    GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)GetCurrentModuleDirPathA, &hModule);
+    GetModuleFileNameA(hModule, dirPath, MAX_PATH);
+    char* pos = strchr(dirPath, L'\\');
+    if (nullptr == pos)
+    {
+        LOG("strchr failed");
+        return false;
+    }
+    *(pos + 1) = '\0';
+    return true;
+}
+
+bool GetCurrentModuleDirPathW(WCHAR* dirPath)
+{
+    HMODULE hModule = NULL;
+    GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)GetCurrentModuleDirPathW, &hModule);
+    GetModuleFileNameW(hModule, dirPath, MAX_PATH);
     wchar_t* pos = wcsrchr(dirPath, L'\\');
     if (nullptr == pos)
     {
@@ -170,6 +185,19 @@ bool RunAppWithRedirection(
     }
 
     free(command_dup);
+    return false;
+}
+
+bool FilePathIsExist(const char* filepath_in, bool is_directory)
+{
+    const DWORD file_attr = ::GetFileAttributesA(filepath_in);
+    if (file_attr != INVALID_FILE_ATTRIBUTES)
+    {
+        if (is_directory)
+            return (file_attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        else
+            return true;
+    }
     return false;
 }
 
