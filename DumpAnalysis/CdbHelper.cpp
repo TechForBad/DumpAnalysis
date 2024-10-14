@@ -95,7 +95,7 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
         return false;
     }
 
-    if (length <= 1)
+    if (length <= 4096)
     {
         std::string command_prefix = tool::Format(".for(r $t0 = 0x%llx; @$t0 < 0x%llx; r $t0 = @$t0 + 1)", (ULONG_PTR)pStartAddress, (ULONG_PTR)pStartAddress + length);
         std::string command_suffix = R"({.if($vvalid(@$t0, 1)){.printf @"%02x ", by(@$t0)}.else{.printf "?? "}};.printf "\n";)";
@@ -113,7 +113,7 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
             std::string splitString = splitStringlist[i];
             if ("??" == splitString)
             {
-                return false;
+                pByte[i] = 0x00;
             }
             else
             {
@@ -130,7 +130,7 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
             LOG("GetCurrentModuleDirPathA failed");
             return false;
         }
-        strcpy(tempFilePath, "temp.txt");
+        strcat(tempFilePath, "temp.txt");
 
         // 如果文件存在，则删除
         if (tool::FilePathIsExist(tempFilePath, false))
@@ -142,29 +142,33 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
             }
         }
 
+        // 发送命令写入文件
+        std::string command = tool::Format(".writemem %s 0x%llx l0x%llx", tempFilePath, (ULONG_PTR)pStartAddress, length);
+        std::string result;
+        if (!SendCommond(command, result))
+        {
+            LOG("SendCommond failed");
+            return false;
+        }
+        if (tool::Format("Writing %x byte", length) != result.substr(0, result.find_last_not_of('.')))
+        {
+            LOG("cdb ret failed, ret: %s", result.c_str());
+            return false;
+        }
+
         // 打开临时文件
         HANDLE hFile = CreateFileA(
             tempFilePath,
             GENERIC_READ | GENERIC_WRITE,
             FILE_SHARE_READ | FILE_SHARE_WRITE,
             NULL,
-            CREATE_ALWAYS,
+            OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
             NULL
         );
         if (INVALID_HANDLE_VALUE == hFile)
         {
             LOG("CreateFileA failed, last error: %d", GetLastError());
-            DeleteFileA(tempFilePath);
-            return false;
-        }
-
-        std::string command = tool::Format(".writemem %s 0x%llx l0x%llx", tempFilePath, (ULONG_PTR)pStartAddress, length);
-        std::string result;
-        if (!SendCommond(command, result))
-        {
-            LOG("SendCommond failed");
-            DeleteFileA(tempFilePath);
             return false;
         }
 
@@ -172,6 +176,7 @@ bool CdbHelper::GetData(PVOID pStartAddress, SIZE_T length, PBYTE pByte)
         if (fileSize != length)
         {
             LOG("GetFileSize failed, read size: %d, need size: %d", fileSize, length);
+            CloseHandle(hFile);
             DeleteFileA(tempFilePath);
             return false;
         }

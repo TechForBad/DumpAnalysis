@@ -112,10 +112,10 @@ bool GetCurrentModuleDirPathA(CHAR* dirPath)
     HMODULE hModule = NULL;
     GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)GetCurrentModuleDirPathA, &hModule);
     GetModuleFileNameA(hModule, dirPath, MAX_PATH);
-    char* pos = strchr(dirPath, L'\\');
+    char* pos = strrchr(dirPath, L'\\');
     if (nullptr == pos)
     {
-        LOG("strchr failed");
+        LOG("strrchr failed");
         return false;
     }
     *(pos + 1) = '\0';
